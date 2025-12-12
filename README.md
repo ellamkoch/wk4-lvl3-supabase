@@ -2,6 +2,25 @@
 
 This is the repo for the Week 4, Level 3 assignments with CodeX for learning about supabase.
 
+## Project Structure
+
+
+
+![](assets/20251211_220132_Project_Structure.png)
+
+## **Tech Stack**
+
+This is what the project is using right now:
+
+* **React (Vite)** — base framework for the app
+* **Supabase** — backend database + authentication + API layer
+* **Sass (SCSS)** — styling and partials
+* **Axios** — for making HTTP requests (will be used later)
+* **React Router DOM** — for routing once we start adding pages
+* **ESLint / Stylelint / HTMLHint** — linting and code quality tools
+* **GitHub Workflows** — automated lint checks
+* **Node + npm** — project tooling and package management
+
 ## Day 1 — React + Supabase Project Setup (Read Functionality)
 
 ### Objective
@@ -84,7 +103,11 @@ It loads env variables, checks for missing values, and creates a single Supabase
 
 Created the base partials (`_layout.scss`, `_tasks.scss`, `_variables.scss`) and made sure everything compiled without issues.
 
-### Files Created / Updated (Day 1)
+10. **Added TaskList and TaskItem components**
+
+Created the basic task components that will be used later for CRUD functionality.
+
+Right now they are just scaffolded and wired into the structure so the project compiles cleanly, and they match the folder layout we’re using for the rest of the week.
 
 ### Files Created / Updated (Day 1)
 
