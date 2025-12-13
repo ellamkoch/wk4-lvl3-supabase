@@ -183,7 +183,7 @@ Created a new `NewTaskForm` component to handle adding tasks.
   * enforces a max character length
 * Calls a parent callback (`onAddTask`) instead of inserting directly into Supabase
 
-The actual insert happens in `TaskList`, which then immediately updates state by prepending the new task. No refetch needed.
+The actual insert happens in `TaskList`, which then immediately updates state by prepending the new task. Because Supabase returns the inserted row, we immediately update local state. Since the React useState drives the UI, there’s no need to refetch the entire list.
 
 3. **Implemented task completion toggling**
 
@@ -212,12 +212,12 @@ Each task now has a delete button.
 Introduced a simple filter system in `TaskList`.
 
 * Filter state lives as `"all" | "active" | "completed"`
-* A derived `visibleTasks` array determines what actually gets rendered
+* A filtered verion of the tasks list, the`visibleTasks` array, determines what actually gets rendered
 * The Original task list stays intact as everything is done client side using the existing state.
 
 6. **Added task summary info**
 
-Derived a couple quick stats from state:
+Pulled a couple quick stats from state to show the:
 
 * total number of tasks
 * number of completed tasks
@@ -248,6 +248,33 @@ There was also a small change from `color.adjust()` to `lighten()` to keep Style
 Added one rule to allow classic Sass color functions:"scss/no-global-function-names": null
 
 This prevents warnings when using functions like `lighten()`.
+
+10. Supabase Row Level Security (RLS) + Why It Mattered This Week
+
+As the task features started coming together, everything looked right in the UI, but adding, updating, or deleting tasks initially failed with authorization errors. This turned out not to be a React issue at all, but a Supabase one.
+
+Supabase enables **Row Level Security (RLS)** by default, which means the database blocks all client-side access unless explicit rules are in place. In my case, part of the issue was that I had missed adding the **read (SELECT) policy** during the previous day’s lecture, so even though tasks existed in the database, nothing was showing up in the UI. Once I caught that, the rest of the behavior started to make a lot more sense.
+
+To fix this, I added RLS policies to the `tasks` table to support full CRUD behavior during development.
+
+**Policies were added for:**
+
+* **SELECT** , reading tasks
+* **INSERT** , creating new tasks
+* **UPDATE** , marking tasks complete or incomplete
+* **DELETE** , removing tasks
+
+The policies apply to both `anon` and `authenticated` roles. This allows the app to function without authentication for now, while still respecting Supabase’s security model. At this stage, the rules are intentionally permissive so the focus stays on understanding data flow and integration rather than user-based access control.
+
+Once these policies were in place, the app immediately behaved as expected. Tasks loaded correctly, new tasks could be added, completion toggles worked, and deletions were confirmed and persisted. More restrictive, user-specific rules can be layered in later when authentication is introduced.
+
+11. Linting and Code Quality Check
+
+After completing the Supabase integration and confirming full CRUD functionality, I ran the project linters locally to make sure everything was clean.
+
+All linters passed without errors, confirming that the JavaScript, SCSS, and HTML changes made during Days 2 and 3 were consistent with the project’s linting rules and overall code standards.
+
+This helped validate that the new logic and styling updates were not only functional, but also aligned with the code quality expectations for the course.
 
 ### Files Created / Updated (Days 2–3)
 

@@ -63,8 +63,8 @@ function TaskList() {
     if (insertedTask) {
       // Prepend the new task to the existing list and react re-renders and runs the visibleTasks.map, which
       setTasks((prev) => [insertedTask, ...prev]); //makes it so that nothing must be refetched or reloaded to add the new task.
-    } //  ...prev spreads the previous tasks into a new array so the array isnt mutated and code is cleaner/faster
-  };
+    } //  ...prev spreads the previous tasks into a new array so the array isn't mutated and code is cleaner/faster
+  };//information is only updated with the insertion task.
 
   /**
    * Toggles the is_complete flag of a task both in Supabase and local state.
