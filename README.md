@@ -4,8 +4,6 @@ This is the repo for the Week 4, Level 3 assignments with CodeX for learning abo
 
 ## Project Structure
 
-
-
 ![](assets/20251211_220132_Project_Structure.png)
 
 ## **Tech Stack**
@@ -150,6 +148,155 @@ Right now they are just scaffolded and wired into the structure so the project c
 
 * `src/assets/react.svg`
 
+## Day 2–3 — Task CRUD, State Management, and Styling Updates
+
+### Objective
+
+Days 2 and 3 was all about taking the basic task scaffolding from Day 1 and turning it into something that actually works. We wired up the code for full CRUD behavior, pushed more logic into the states, and cleaned up the task UI so it matches how the components evolved.
+
+Most of this work was expanding what already existed rather than adding brand-new files.
+
+### What I Worked On
+
+1. **Expanded `TaskList` into the main controller for tasks**
+
+`TaskList` is now doing the heavy lifting for task behavior:
+
+* Fetches tasks from Supabase when the component mounts
+* Stores tasks in React state
+* Handles create, update, and delete actions
+* Passes callbacks down to child components instead of letting them talk to Supabase directly
+
+This keeps all database logic in one place and makes the child components much simpler.
+
+2. **Added task creation with `NewTaskForm`**
+
+Created a new `NewTaskForm` component to handle adding tasks.
+
+* Uses local state for:
+  * input value
+  * submitting/loading state
+  * form-level errors
+* Validates input before submitting:
+  * trims whitespace
+  * prevents empty titles
+  * enforces a max character length
+* Calls a parent callback (`onAddTask`) instead of inserting directly into Supabase
+
+The actual insert happens in `TaskList`, which then immediately updates state by prepending the new task. Because Supabase returns the inserted row, we immediately update local state. Since the React useState drives the UI, there’s no need to refetch the entire list.
+
+3. **Implemented task completion toggling**
+
+Tasks can now be marked complete or incomplete with a checkbox or by clicking on the title of the task.
+
+* `TaskItem` receives an `onToggleComplete` callback from `TaskList`
+* Toggling the checkbox:
+  * updates the `is_complete` field in Supabase
+  * updates local state using an immutable `map()` pattern
+* The UI updates automatically based on state
+
+This reinforces the pattern that child components *trigger* changes, but the parent owns the data.
+
+4. **Added task deletion**
+
+Each task now has a delete button.
+
+* Clicking delete:
+  * asks for confirmation from the user
+  * deletes the task from Supabase
+  * removes it from local state using `filter()`
+* Again, no full refetch required
+
+5. **Added client-side task filtering**
+
+Introduced a simple filter system in `TaskList`.
+
+* Filter state lives as `"all" | "active" | "completed"`
+* A filtered verion of the tasks list, the`visibleTasks` array, determines what actually gets rendered
+* The Original task list stays intact as everything is done client side using the existing state.
+
+6. **Added task summary info**
+
+Pulled a couple quick stats from state to show the:
+
+* total number of tasks
+* number of completed tasks
+
+Values calculated based on current state instead of storing extra data.
+
+7. **Expanded `TaskItem` from read-only to interactive**
+
+`TaskItem` started as a read-only display component and then was expanded by:
+
+* Adding a checkbox for completion
+* Adding a delete button
+* It now uses small local helpers (`handleToggle`, `handleDelete`) that call parent callbacks
+
+8. **Updated task-specific SCSS**
+
+The `_tasks.scss` file was updated to reflect the new structure:
+
+* Styles the new task form (input + submit button)
+* Added hover, focus, disabled, and active states
+* Styled task rows, checkboxes, delete button, and summary text
+* Continued using spacing and color variables for consistency
+
+There was also a small change from `color.adjust()` to `lighten()` to keep Stylelint from throwing errors.
+
+9. **Updated Stylelint config**
+
+Added one rule to allow classic Sass color functions:"scss/no-global-function-names": null
+
+This prevents warnings when using functions like `lighten()`.
+
+10. Supabase Row Level Security (RLS) + Why It Mattered This Week
+
+As the task features started coming together, everything looked right in the UI, but adding, updating, or deleting tasks initially failed with authorization errors. This turned out not to be a React issue at all, but a Supabase one.
+
+Supabase enables **Row Level Security (RLS)** by default, which means the database blocks all client-side access unless explicit rules are in place. In my case, part of the issue was that I had missed adding the **read (SELECT) policy** during the previous day’s lecture, so even though tasks existed in the database, nothing was showing up in the UI. Once I caught that, the rest of the behavior started to make a lot more sense.
+
+To fix this, I added RLS policies to the `tasks` table to support full CRUD behavior during development.
+
+**Policies were added for:**
+
+* **SELECT** , reading tasks
+* **INSERT** , creating new tasks
+* **UPDATE** , marking tasks complete or incomplete
+* **DELETE** , removing tasks
+
+The policies apply to both `anon` and `authenticated` roles. This allows the app to function without authentication for now, while still respecting Supabase’s security model. At this stage, the rules are intentionally permissive so the focus stays on understanding data flow and integration rather than user-based access control.
+
+Once these policies were in place, the app immediately behaved as expected. Tasks loaded correctly, new tasks could be added, completion toggles worked, and deletions were confirmed and persisted. More restrictive, user-specific rules can be layered in later when authentication is introduced.
+
+11. Linting and Code Quality Check
+
+After completing the Supabase integration and confirming full CRUD functionality, I ran the project linters locally to make sure everything was clean.
+
+All linters passed without errors, confirming that the JavaScript, SCSS, and HTML changes made during Days 2 and 3 were consistent with the project’s linting rules and overall code standards.
+
+This helped validate that the new logic and styling updates were not only functional, but also aligned with the code quality expectations for the course.
+
+### Files Created / Updated (Days 2–3)
+
+**Task Components**
+
+* `src/components/tasks/NewTaskForm.jsx`
+* `src/components/tasks/TaskItem.jsx` (expanded)
+* `src/components/tasks/TaskList.jsx` (expanded)
+
+**Styles**
+
+* `src/styles/_tasks.scss` (updated)
+
+**Config**
+
+* `stylelint.config.cjs` (updated rules)
+
+### Notes / Still in Progress
+
+* I still need to run everything locally and fully test the flows.
+* I need to finish watching the lecture recording to confirm what we updated in Supabase (RLS policies, etc.).
+
 ## How to Run This Project
 
 npm install
@@ -160,4 +307,5 @@ Make sure `.env.local` exists and contains your Supabase URL and anon key.
 ## Resources
 
 * Supabase Documentation - [https://supabase.com/docs/guides](https://supabase.com/docs/guides)
+* React documentation - [https://react.dev/reference/react](https://react.dev/reference/react)
 
