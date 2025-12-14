@@ -292,17 +292,173 @@ This helped validate that the new logic and styling updates were not only functi
 
 * `stylelint.config.cjs` (updated rules)
 
-### Notes / Still in Progress
+## Day 4 — Refactor, Hooks, and Cleanup
 
-* I still need to run everything locally and fully test the flows.
-* I need to finish watching the lecture recording to confirm what we updated in Supabase (RLS policies, etc.).
+### Objective
 
-## How to Run This Project
+Day 4 was about cleaning things up rather than adding new features. The task app already worked, but the code was getting harder to follow as more logic was added. The goal was to refactor the project so responsibilities were clearer, components were easier to reason about, and the structure looked more like something you’d expect in a real-world React app.
 
-npm install
-npm run dev
+### What I Worked On
 
-Make sure `.env.local` exists and contains your Supabase URL and anon key.
+1. **Moved all Supabase logic into a custom hook**
+
+Created a `useTasks` custom hook to handle *all* task-related logic:
+
+* loading tasks from Supabase
+* adding new tasks
+* toggling completion
+* deleting tasks
+* managing loading and error state
+
+This removed all direct Supabase calls from `TaskList`.
+
+`TaskList` now focuses on UI and user interaction, while the hook owns the data and side effects.
+
+This made the flow much easier to follow and keeps database logic in one place.
+
+2. **Updated `TaskList` to use the custom hook**
+
+Updated `TaskList` to:
+
+* consume `tasks`, `loading`, and `error` from `useTasks`
+* call hook functions (`addTask`, `toggleTask`, `deleteTask`) instead of handling Supabase directly
+* manage only UI-specific state (like the task filter)
+
+This meant `TaskList` became more reusable and easier to read, since it no longer mixes UI logic with database logic.
+
+3. **Used `useMemo` for derived values**
+
+Added `useMemo` where values are derived from existing state:
+
+* total task count
+* completed task count
+* filtered task list (`visibleTasks`)
+
+This ensures React only recalculates those values when their dependencies change, and it also made the intent of the code clearer: these values come *from* state, they aren’t stored separately.
+
+4. **Confirmed component independence**
+
+After the update:
+
+* `TaskItem` only knows how to display a task and trigger callbacks
+* `NewTaskForm` only manages form input and submission
+* neither component knows anything about Supabase
+
+This confirms the components can be reused later with a different backend or data source if needed.
+
+5. **Updated layout and global styles**
+
+Made small but important updates to the global layout SCSS:
+
+* tightened up spacing and structure in the app shell
+* cleaned up card styles and shared utilities
+* ensured consistent typography and background behavior
+
+These changes didn’t affect functionality, but they improved readability and visual consistency.
+
+6. **Updated app entry structure**
+
+Cleaned up the app wiring so the structure is clearer:
+
+* `main.jsx` handles global imports and rendering
+* `App.jsx` is responsible for composing the layout and main content
+* `MainLayout` wraps shared UI like header and footer
+
+This keeps responsibilities clean and predictable.
+
+7. **Environment variable documentation**
+
+Added a `.env.example` file to show what environment variables are required:
+VITE_SUPABASE_URL=<your-supabase-url>
+VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
+
+8. **Linting and tooling checks**
+
+* Installed ESLint locally (it wasn’t present initially)
+* Ran all linters after refactoring
+* Everything passes clean now
+
+While testing lint scripts, I briefly ran into an ESLint path issue. I was able to resolve it once I realized I had accidentally created a second workspace within my workspace... oops.
+
+### Files Updated (Day 4)
+
+**Hooks**
+
+* `src/components/hooks/useTasks.js`
+
+**Task Components**
+
+* `src/components/tasks/TaskList.jsx` (updated to use hook)
+
+**Layout**
+
+* `src/components/layout/MainLayout.jsx`
+* `src/styles/_layout.scss`
+
+**App Setup**
+
+* `src/App.jsx`
+* `src/main.jsx`
+
+**Config / Docs**
+
+* `.env.example`
+* `.gitignore`
+
+## Installation
+
+### Prerequisites
+
+Before starting, make sure you have:
+
+* **Node.js** (v18+ recommended)
+* A **Supabase account** with a project created
+
+### Setup Steps
+
+1. **Clone the repo**
+   git clone <repository-url>
+   cd <repository-directory>
+2. Install dependencies
+   npm install
+   This project uses React, Vite, Supabase, Sass, and React Bootstrap. All required dependencies are listed in `package.json`.
+
+3. **Set up environment variables**
+
+Create a `.env.local` file based on the example using git:
+cp .env.example .env.local
+
+Then add your Supabase credentials based on the .env.example file.
+
+`.env.local` is gitignored so your credentials are never committed.
+
+4. **Configure Supabase**
+
+In your Supabase project:
+
+* Create a `tasks` table with:
+  * `id` (int8, primary key)
+  * `created_at` (timestamp, default `now()`)
+  * `title` (text)
+  * `is_complete` (boolean, default `false`)
+* Enable **Row Level Security (RLS)**
+* Add policies for:
+  * SELECT
+  * INSERT
+  * UPDATE
+  * DELETE
+
+    (Policies are intentionally permissive for development.)
+
+5. Run the development server
+   npm run dev
+6. Vite will start the app and provide you with a local file to view in the browser.
+
+### Notes
+
+* The app does **not** require authentication yet — it uses Supabase’s `anon` role.
+* Task logic is handled through a custom React hook (`useTasks`) to keep components clean and reusable.
+* Styling is handled with SCSS partials and React Bootstrap for UI helpers.
 
 ## Resources
 
