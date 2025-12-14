@@ -1,14 +1,15 @@
-
-// tool imports from react
-import { StrictMode } from 'react'; // activates extra checks and warning during dev
-import { createRoot } from 'react-dom/client';// modern api for creating the root react DOM node
-//importing styles
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/main.scss';
-//importing root app functionality for the render function below
 import App from './App.jsx';
 
-createRoot(document.getElementById('root')).render(
+// Get the root element from the HTML
+const rootElement = document.getElementById('root');
+
+// Create a root and render the App component inside StrictMode
+createRoot(rootElement).render(
   <StrictMode>
-    <App /> /
+    <App />
   </StrictMode>,
 );
