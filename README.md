@@ -8,16 +8,22 @@ This is the repo for the Week 4, Level 3 assignments with CodeX for learning abo
 
 ## **Tech Stack**
 
-This is what the project is using right now:
-
 * **React (Vite)** — base framework for the app
 * **Supabase** — backend database + authentication + API layer
+* **Netlify** — deployment and hosting
 * **Sass (SCSS)** — styling and partials
+* **React Bootstrap** — UI helpers (spinner, base components)
 * **Axios** — for making HTTP requests (will be used later)
 * **React Router DOM** — for routing once we start adding pages
 * **ESLint / Stylelint / HTMLHint** — linting and code quality tools
 * **GitHub Workflows** — automated lint checks
 * **Node + npm** — project tooling and package management
+
+## Live Demo
+
+Deployed on Netlify:
+
+https://wk4-lvl3-supabase.netlify.app/
 
 ## Day 1 — React + Supabase Project Setup (Read Functionality)
 
@@ -45,7 +51,7 @@ Today I set up base for this week’s project up. Most of today was just wiring 
 2. **Initialized npm and installed the main dependencies for the project.**
 
 * Ran `npm init -y` to initialize npm for the project
-* Then installed depdencies
+* Then installed dependencies
 * `npm install`
 * `npm install @supabase/supabase-js` to install the js client library for supabase
 * `npm install sass axios react-router-dom` to set up sass, axios and the react router dom for the project
@@ -212,7 +218,7 @@ Each task now has a delete button.
 Introduced a simple filter system in `TaskList`.
 
 * Filter state lives as `"all" | "active" | "completed"`
-* A filtered verion of the tasks list, the`visibleTasks` array, determines what actually gets rendered
+* A filtered version of the tasks list, the`visibleTasks` array, determines what actually gets rendered
 * The Original task list stays intact as everything is done client side using the existing state.
 
 6. **Added task summary info**
@@ -384,7 +390,7 @@ While testing lint scripts, I briefly ran into an ESLint path issue. I was able 
 
 **Hooks**
 
-* `src/components/hooks/useTasks.js`
+* `src/hooks/useTasks.js`
 
 **Task Components**
 
@@ -422,7 +428,6 @@ Before starting, make sure you have:
 2. Install dependencies
    npm install
    This project uses React, Vite, Supabase, Sass, and React Bootstrap. All required dependencies are listed in `package.json`.
-
 3. **Set up environment variables**
 
 Create a `.env.local` file based on the example using git:
@@ -459,6 +464,41 @@ In your Supabase project:
 * The app does **not** require authentication yet — it uses Supabase’s `anon` role.
 * Task logic is handled through a custom React hook (`useTasks`) to keep components clean and reusable.
 * Styling is handled with SCSS partials and React Bootstrap for UI helpers.
+
+## Day 5 — Deployment (Netlify)
+
+### Objective
+
+Day 5 was all about getting the project live. The goal wasn’t to change the app logic — it was to deploy it with Netlify, set up the environment variables correctly, and confirm everything works the same way it does locally.
+
+### What I Did Today
+
+1. **Deployed the app to Netlify**
+
+   Connected the repo to Netlify and deployed the project successfully.
+2. **Added environment variables in Netlify**
+
+   Since `.env.local` is only for local development (and is gitignored), I added the Supabase values directly in Netlify:
+
+   * `VITE_SUPABASE_URL`
+   * `VITE_SUPABASE_ANON_KEY`
+
+   This lets the deployed build connect to my Supabase project without exposing secrets in the repo.
+3. **Verified the live app works**
+
+   After deployment, I tested the full task flow in the Netlify version:
+
+   * tasks load successfully
+   * adding tasks works
+   * toggling completion works
+   * deleting tasks works
+
+   Everything behaved the same as local `npm run dev`.
+
+### Notes
+
+* Netlify environment variables replace `.env.local` in production.
+* The project is now live and ready to share for review.
 
 ## Resources
 
